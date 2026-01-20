@@ -1,0 +1,32 @@
+# 1. Configuration
+$ShortcutName = "Install CME.lnk"
+$InstallationUrl = "https://cmedirect.cmegroup.com/client/CMEDirect.application"
+$DesktopPath = [System.IO.Path]::Combine($env:USERPROFILE, "Desktop")
+$ShortcutPath = [System.IO.Path]::Combine($DesktopPath, $ShortcutName)
+
+# 2. Create the COM Object for the shortcut
+$WshShell = New-Object -ComObject WScript.Shell
+
+try {
+    Write-Host "Creating shortcut at: $ShortcutPath" -ForegroundColor Cyan
+    
+    $Shortcut = $WshShell.CreateShortcut($ShortcutPath)
+    
+    # Target: We point to rundll32 to execute the ClickOnce engine with the CME URL
+    $Shortcut.TargetPath = "rundll32.exe"
+    $Shortcut.Arguments = "dfshim.dll,ShOpenVerbApplication $InstallationUrl"
+    
+    # Optional: Set a specific icon (Index 14 is a standard 'install' software icon in shell32.dll)
+    $Shortcut.IconLocation = "shell32.dll, 14"
+    
+    $Shortcut.Description = "Installs or Updates CME Direct from CME Group"
+    $Shortcut.WorkingDirectory = $env:USERPROFILE
+    
+    # Save the shortcut
+    $Shortcut.Save()
+    
+    Write-Host "Success: 'Install CME' shortcut is now on your desktop." -ForegroundColor Green
+}
+catch {
+    Write-Error "Failed to create shortcut: $($_.Exception.Message)"
+}
