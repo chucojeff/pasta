@@ -1,0 +1,3 @@
+const resp = fetch("/plugin/products/deploy/v1/jobs/extended-information/sync-software-package-files")
+const r = resp.json()
+console.log(r)
